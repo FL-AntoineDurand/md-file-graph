@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "md-file-graph"
+version = "0.1.0"
+description = "A tool to analyze markdown files and visualize their link structure as a graph"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "GPL-3.0-or-later"}
+authors = [
+    {name = "md-file-graph contributors"}
+]
+keywords = ["markdown", "graph", "visualization", "documentation"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Documentation",
+    "Topic :: Software Development :: Documentation",
+]
+
+dependencies = [
+    "click>=8.0.0",
+    "graphviz>=0.20.0",
+    "markdown-it-py>=3.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[project.scripts]
+md-file-graph = "md_file_graph.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/md-file-graph"
+Repository = "https://github.com/yourusername/md-file-graph"
+Issues = "https://github.com/yourusername/md-file-graph/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["md_file_graph*"]
+

@@ -9,6 +9,7 @@ import click
 from pathlib import Path
 from .parser import MarkdownParser
 from .graph import GraphBuilder
+from .html_generator import HTMLGenerator
 
 
 @click.command()
@@ -102,6 +103,75 @@ def main(directory, output, name, include_external, hide_isolated, no_gitignore,
     click.echo("✨ Done!")
 
 
+@click.command()
+@click.argument('directory', type=click.Path(exists=True, file_okay=False, dir_okay=True))
+@click.option('-o', '--output', type=click.Path(), required=True,
+              help='Output directory for generated HTML files')
+@click.option('--base-url', required=True,
+              help='Base URL for the website (e.g., https://example.com)')
+@click.option('--template', type=click.Path(exists=True), default=None,
+              help='Path to custom Jinja2 HTML template')
+@click.option('--config', type=click.Path(exists=True), default=None,
+              help='Path to configuration JSON file')
+@click.option('--no-gitignore', is_flag=True,
+              help='Do not respect .gitignore files (include all files)')
+@click.option('--no-default-excludes', is_flag=True,
+              help='Do not exclude common directories like node_modules')
+def generate_html(directory, output, base_url, template, config, no_gitignore, no_default_excludes):
+    """
+    Generate static HTML documentation site with SEO optimization.
+    
+    DIRECTORY: Path to the directory containing markdown files to convert.
+    """
+    try:
+        # Convert to Path objects
+        dir_path = Path(directory).resolve()
+        output_path = Path(output).resolve()
+        template_path = Path(template) if template else None
+        config_path = Path(config) if config else None
+        
+        # Create output directory
+        output_path.mkdir(parents=True, exist_ok=True)
+        
+        # Initialize HTML generator
+        generator = HTMLGenerator(
+            base_dir=dir_path,
+            output_dir=output_path,
+            base_url=base_url,
+            template_path=template_path,
+            config_path=config_path
+        )
+        
+        # Generate site
+        stats = generator.generate_all()
+        
+        # Display summary
+        click.echo()
+        click.echo("📊 Generation Summary:")
+        click.echo(f"   Pages generated: {stats['pages_generated']}/{stats['pages_total']}")
+        click.echo(f"   URLs in sitemap: {stats['urls_in_sitemap']}")
+        click.echo(f"   Output directory: {stats['output_dir']}")
+        
+    except ImportError as e:
+        click.echo(f"❌ Error: {e}")
+        click.echo()
+        click.echo("Install required dependencies:")
+        click.echo("  pip install markdown python-frontmatter jinja2 beautifulsoup4 Pygments")
+    except Exception as e:
+        click.echo(f"❌ Error: {e}")
+        raise
+
+
+@click.group()
+def cli():
+    """md-file-graph: Analyze and visualize markdown documentation."""
+    pass
+
+
+cli.add_command(main, name='graph')
+cli.add_command(generate_html, name='html')
+
+
 if __name__ == '__main__':
-    main()
+    cli()
 
